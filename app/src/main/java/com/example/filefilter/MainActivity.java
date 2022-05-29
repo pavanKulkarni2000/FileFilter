@@ -87,12 +87,16 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
     }
 
     private void searchWithFilters() {
-        if(searchResult.isDone() || latestFolderSearch.equals(currentFolder)){
-            Toast.makeText(this,"Search in progress",Toast.LENGTH_SHORT).show();
-        }else{
-            latestFolderSearch=currentFolder;
-            searchResult = executorService.submit(new FileLister(currentFolder, this));
+        if( !searchResult.isDone() ) {
+            if (latestFolderSearch.equals(currentFolder)) {
+                Toast.makeText(this, "Search in progress", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                searchResult.cancel(true);
+            }
         }
+        latestFolderSearch = currentFolder;
+        searchResult = executorService.submit(new FileLister(currentFolder, this));
     }
 
     public void folderDialog(View view) {
