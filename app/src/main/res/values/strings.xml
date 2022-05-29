@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">File Filter</string>
+    <string name="current_folder">Current folder:</string>
+    <string name="select_folder">Select folder</string>
+    <string name="files">Files:</string>
+    <string name="emptyList">This path is empty.</string>
+    <string name="column_size">Size</string>
+    <string name="column_file">File</string>
+    <string name="column_date">Date</string>
+</resources>
