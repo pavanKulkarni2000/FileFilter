@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.filefilter.fileFetcher.FileListAdapter;
 import com.example.filefilter.fileFetcher.FileListItem;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
     ExecutorService executorService;
     String currentFolder;
     String latestFolderSearch;
+    Future searchResult;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
         fileListAdapter=new FileListAdapter(fileList);
         fileListView.setAdapter(fileListAdapter);
 
-        //initialize executor services for backgound work
+        //initialize executor services for background work
         executorService= Executors.newFixedThreadPool(4);
 
         //initialize currentFolder variable to internal storage root folder
@@ -84,18 +86,13 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
         searchWithFilters();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_DIRECTORY) {
-            //
-//            setCurrentFolder();
-        }
-    }
-
     private void searchWithFilters() {
-        Future<?> submit = executorService.submit(new FileLister(currentFolder, this));
+        if(searchResult.isDone() || latestFolderSearch.equals(currentFolder)){
+            Toast.makeText(this,"Search in progress",Toast.LENGTH_SHORT).show();
+        }else{
+            latestFolderSearch=currentFolder;
+            searchResult = executorService.submit(new FileLister(currentFolder, this));
+        }
     }
 
     public void folderDialog(View view) {
