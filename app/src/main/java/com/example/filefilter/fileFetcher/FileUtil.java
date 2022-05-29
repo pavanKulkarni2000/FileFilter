@@ -16,6 +16,7 @@ public class FileUtil {
     public static final long UNIT_MEGA_BYTE=UNIT_KILO_BYTE*UNIT_KILO_BYTE;
     public static final long UNIT_GIGA_BYTE=UNIT_KILO_BYTE*UNIT_KILO_BYTE*UNIT_KILO_BYTE;
     private static final String TAG = "FileUtil";
+    public static final SimpleDateFormat simpleDateFormat =new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
 
     public static FileListItem createFileListItem(File file){
 
@@ -51,6 +52,6 @@ public class FileUtil {
         }
     }
     public static String getFileDate(File file){
-        return new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).format(file.lastModified());
+        return simpleDateFormat.format(file.lastModified());
     }
 }

@@ -1,21 +1,28 @@
 package com.example.filefilter;
 
 import static com.example.filefilter.Util.managePermissions;
+import static com.example.filefilter.fileFetcher.FileUtil.simpleDateFormat;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.filefilter.fileFetcher.FileFilterInfo;
+import com.example.filefilter.fileFetcher.FileSearchData;
 import com.example.filefilter.fileFetcher.FileListAdapter;
 import com.example.filefilter.fileFetcher.FileListItem;
 import com.example.filefilter.fileFetcher.FileLister;
@@ -25,6 +32,8 @@ import com.example.filefilter.folderPicker.IFolderSelectedCallback;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -42,16 +51,18 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
     private ProgressBar progressBarView;
     private RecyclerView fileListView;
     private View currentView;
+    private TextView dateStartTextView,dateEndTextView;
+    private CheckBox dateCheckBox;
 
     //controller
     private FileListAdapter fileListAdapter;
+    private RadioGroup fileTypeRadioGroup;
 
     //state
     private List<FileListItem> fileList;
     private String currentFolder;
-    private String latestFolderSearch;
     private Future<?> searchResult;
-    private FileFilterInfo fileFilterInfo;
+    private FileSearchData fileSearchData;
 
 
     @Override
@@ -82,7 +93,84 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
         fileListView.setAdapter(fileListAdapter);
         currentView=fileListView;
 
-        fileFilterInfo =new FileFilterInfo();
+        //filtering
+        fileTypeRadioGroup=findViewById(R.id.file_type_radio_group);
+        fileTypeRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
+            if(fileSearchData.getFileType()!=i){
+                fileSearchData.setFileType(i);
+                searchWithFilters();
+            }
+        });
+        dateStartTextView=findViewById(R.id.date_start);
+        dateStartTextView.setOnClickListener(textView -> {
+            Date date=fileSearchData.getStartDate();
+            Calendar cldr = Calendar.getInstance();
+            if(date!=null){
+                cldr.setTime(date);
+            }
+            int now_day = cldr.get(Calendar.DAY_OF_MONTH);
+            int now_month = cldr.get(Calendar.MONTH);
+            int now_year = cldr.get(Calendar.YEAR);
+            // date picker dialog
+            DatePickerDialog picker = new DatePickerDialog(MainActivity.this,
+                    (datePickerView, year, month, day) -> {
+                        cldr.set(year,month,day);
+                        Date selectedStartDate=cldr.getTime();
+                        if(fileSearchData.getEndDate()!=null && selectedStartDate.getTime()>fileSearchData.getEndDate().getTime()){
+                            Toast.makeText(getApplicationContext(),"Start date cannot be after end date.",Toast.LENGTH_SHORT).show();
+                        }else {
+                            fileSearchData.setStartDate(cldr.getTime());
+                            dateStartTextView.setText(String.format("From: %s", simpleDateFormat.format(fileSearchData.getStartDate())));
+                        }
+                    }, now_year, now_month, now_day);
+            picker.show();
+        });
+        dateEndTextView=findViewById(R.id.date_end);
+        dateEndTextView.setOnClickListener(textView -> {
+            Date date=fileSearchData.getEndDate();
+            Calendar cldr = Calendar.getInstance();
+            if(date!=null){
+                cldr.setTime(date);
+            }
+            int now_day = cldr.get(Calendar.DAY_OF_MONTH);
+            int now_month = cldr.get(Calendar.MONTH);
+            int now_year = cldr.get(Calendar.YEAR);
+            // date picker dialog
+            DatePickerDialog picker = new DatePickerDialog(MainActivity.this,
+                    (datePickerView, year, month, day) -> {
+                        cldr.set(year,month,day);
+                        Date selectedEndDate = cldr.getTime();
+                        if(fileSearchData.getStartDate()!=null && selectedEndDate.getTime() < fileSearchData.getStartDate().getTime()){
+                            Toast.makeText(getApplicationContext(),"End date cannot be before start date.",Toast.LENGTH_SHORT).show();
+                        }else{
+                            fileSearchData.setEndDate(selectedEndDate);
+                            dateEndTextView.setText(String.format("To: %s", simpleDateFormat.format(selectedEndDate)));
+                        }
+                    }, now_year, now_month, now_day);
+            picker.show();
+        });
+        dateCheckBox=findViewById(R.id.date_check);
+        dateCheckBox.setOnCheckedChangeListener((compoundButton, b) -> {
+            if(b){
+                if(fileSearchData.getStartDate()==null){
+                    Toast.makeText(getApplicationContext(),"Select start date!",Toast.LENGTH_SHORT).show();
+                    compoundButton.setChecked(false);
+                } else if(fileSearchData.getEndDate()==null){
+                    Toast.makeText(getApplicationContext(),"Select end date!",Toast.LENGTH_SHORT).show();
+                    compoundButton.setChecked(false);
+                }else if(fileSearchData.getStartDate().getTime()>=fileSearchData.getEndDate().getTime()){
+                    Toast.makeText(getApplicationContext(),"Start date should be before end date!",Toast.LENGTH_SHORT).show();
+                    compoundButton.setChecked(false);
+                }
+                fileSearchData.setDateFlag(true);
+                searchWithFilters();
+            }else{
+                fileSearchData.setDateFlag(false);
+                searchWithFilters();
+            }
+        });
+
+        fileSearchData =new FileSearchData();
 
         //initialize executor services for background work
         executorService= Executors.newFixedThreadPool(4);
@@ -98,24 +186,18 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
     }
 
     private void setCurrentFolder(String folder ) {
-        swapCurrentView(progressBarView);
         currentFolder =folder;
         currentFolderTextView.setText(currentFolder);
         searchWithFilters();
     }
 
     private void searchWithFilters() {
+        swapCurrentView(progressBarView);
         if( searchResult!=null && !searchResult.isDone() ) {
-            if (latestFolderSearch.equals(currentFolder)) {
-                Toast.makeText(this, "Search in progress", Toast.LENGTH_SHORT).show();
-                return;
-            } else {
                 searchResult.cancel(true);
-            }
         }
-        latestFolderSearch = currentFolder;
         Log.d(TAG, "searchWithFilters: sending search requets for path "+currentFolder);
-        searchResult = executorService.submit(new FileLister(currentFolder, fileFilterInfo, this));
+        searchResult = executorService.submit(new FileLister(currentFolder, fileSearchData, this));
     }
 
     public void folderDialog(View view) {

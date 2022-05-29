@@ -2,6 +2,8 @@ package com.example.filefilter.fileFetcher;
 
 import android.util.Log;
 
+import com.example.filefilter.R;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -15,11 +17,11 @@ public class FileLister implements Runnable {
     private static final String TAG = "FileLister";
     private final IFileListReadyCallback callback;
     private final String currentFolder;
-    private final FileFilterInfo fileFilterInfo;
-    public FileLister(String currentFolder, FileFilterInfo fileFilterInfo, IFileListReadyCallback fileListReadyCallback){
+    private final FileSearchData fileSearchData;
+    public FileLister(String currentFolder, FileSearchData fileSearchData, IFileListReadyCallback fileListReadyCallback){
         this.currentFolder=currentFolder;
         this.callback=fileListReadyCallback;
-        this.fileFilterInfo = fileFilterInfo;
+        this.fileSearchData = fileSearchData;
     }
     @Override
     public void run() {
@@ -31,23 +33,38 @@ public class FileLister implements Runnable {
 
     private FileFilter getFileFilterFromFlags() {
         return file -> {
-            if (fileFilterInfo.isDateFlag()) {
-                if (file.lastModified() < fileFilterInfo.getStartDate() || file.lastModified() > fileFilterInfo.getEndDate())
+            if (fileSearchData.isDateFlag()) {
+                Log.d(TAG, "getFileFilterFromFlags: lastmodified="+file.lastModified()+" start="+fileSearchData.getStartDate().getTime()+" end="+fileSearchData.getEndDate().getTime());
+                if (file.lastModified() < fileSearchData.getStartDate().getTime() || file.lastModified() > fileSearchData.getEndDate().getTime())
                     return false;
             }
-            if(fileFilterInfo.isTypeFlag()){
-                String ext = null;
-                try {
-                    String mime = Files.probeContentType(file.toPath());
-                    ext=((mime==null)?"other":mime.split("/")[0]);
-                    if(ext.equals("text")) ext="application";
-                } catch (IOException e) {
-                    Log.e(TAG, "getFileFilterFromFlags: ",e );
-                    ext="other";
-                }
-                return ext.equals(fileFilterInfo.getFileType());
+            if(fileSearchData.getFileType()== R.id.mime_all){
+                return true;
             }
-            return true;
+
+            String mime = null;
+            try {
+                String ext = Files.probeContentType(file.toPath());
+                mime=((ext==null)?"other":ext.split("/")[0]);
+            } catch (IOException e) {
+                Log.e(TAG, "getFileFilterFromFlags: ",e );
+            }
+
+            switch (fileSearchData.getFileType()){
+                case R.id.mime_other:
+                    return mime==null || mime.equals("other");
+                case R.id.mime_doc:
+                    return mime!=null && (mime.equals("application") || mime.equals("text"));
+                case R.id.mime_image:
+                    return mime!=null && mime.equals("image");
+                case R.id.mime_video:
+                    return mime!=null && mime.equals("video") ;
+                case R.id.mime_audio:
+                    return mime!=null && mime.equals("audio");
+                default:
+                    Log.e(TAG, "getFileFilterFromFlags: unknown file type set in filters"+fileSearchData.getFileType() );
+                    return false;
+            }
         };
     }
 
