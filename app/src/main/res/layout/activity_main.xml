@@ -27,12 +27,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/current_folder"
-                    android:textStyle="bold"/>
+                    android:padding="10dp"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/heading1"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/select_folder"
@@ -42,44 +44,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:scrollbars="vertical"
-                        android:padding="10pt"/>
+                        android:padding="4dp"/>
                 </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/file_name"
-                        android:textSize="14sp"
-                        android:text="@string/column_file"
-                        android:textStyle="bold"
-                        android:layout_weight="5"
-                        android:padding="8dp"/>
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/file_size"
-                        android:textSize="14sp"
-                        android:text="@string/column_size"
-                        android:textStyle="bold"
-                        android:padding="8dp"
-                        android:layout_weight="2"/>
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/file_date"
-                        android:textSize="14sp"
-                        android:text="@string/column_date"
-                        android:textStyle="bold"
-                        android:padding="8dp"
-                        android:layout_weight="2"/>
-                </LinearLayout>
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/file_list"/>
+                <include layout="@layout/file_filter_layout"/>
+                <include layout="@layout/file_table_layout"/>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

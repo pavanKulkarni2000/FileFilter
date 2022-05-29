@@ -1,7 +1,5 @@
 package com.example.filefilter.folderPicker;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -48,7 +46,7 @@ public class FolderPickerDialog extends DialogFragment {
 
         View dialog = inflater.inflate(R.layout.folder_picker_dialog, container, false);
         folderListView = dialog.findViewById(R.id.folder_list);
-        folderListView.setEmptyView(dialog.findViewById(R.id.empty_list_item));
+        folderListView.setEmptyView(dialog.findViewById(R.id.empty_message));
 
         init();
 

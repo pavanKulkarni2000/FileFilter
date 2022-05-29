@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="all">All</string>
+    <string name="documents">Documents</string>
+    <string name="others">Others</string>
+    <string name="images">Images</string>
+    <string name="video">Video</string>
+    <string name="audio">Audio</string>
+</resources>

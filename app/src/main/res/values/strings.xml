@@ -7,4 +7,7 @@
     <string name="column_size">Size</string>
     <string name="column_file">File</string>
     <string name="column_date">Date</string>
+    <string name="filters">Filters:</string>
+    <string name="from_date">From: </string>
+    <string name="to_date">To: </string>
 </resources>

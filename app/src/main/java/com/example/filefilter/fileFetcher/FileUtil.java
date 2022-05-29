@@ -53,10 +53,4 @@ public class FileUtil {
     public static String getFileDate(File file){
         return new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).format(file.lastModified());
     }
-//
-//    private static String monthOf(int month) {
-//        switch (month){
-//
-//        }
-//    }
 }

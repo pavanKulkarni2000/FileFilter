@@ -35,7 +35,7 @@
         android:layout_height="match_parent"
         android:id="@+id/folder_list"/>
     <TextView
-        android:id="@+id/empty_list_item"
+        android:id="@+id/empty_message"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingVertical="30dp"

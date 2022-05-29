@@ -3,6 +3,7 @@ package com.example.filefilter;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -26,7 +27,25 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Uri uri= Uri.parse("/sdcard");
-        Log.i(TAG, "uri: "+uri.toString());
+        System.out.println("uri: "+uri.toString());
+
+        assertEquals(getMimeType("dsicj.doc"),"application");
+        assertEquals(getMimeType("dsicj.docx"),"application");
+        assertEquals(getMimeType("dsicj.txt"),"text");
+        assertEquals(getMimeType("dsicj.ogg"),"audio");
+        assertEquals(getMimeType("dsicj.config"),"application");
         assertEquals("com.example.filefilter", appContext.getPackageName());
+    }
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        String type_subtype=null;
+        if (extension != null) {
+            type_subtype = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        if(type_subtype!=null){
+            type=type_subtype.split("/")[0];
+        }
+        return type;
     }
 }
