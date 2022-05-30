@@ -1,6 +1,5 @@
 package com.example.filefilter.fileFetcher;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,9 +13,9 @@ import com.example.filefilter.R;
 import java.util.List;
 
 public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHolder> {
-    private List<FileListItem> files;
+    private List<FileData> files;
 
-    public FileListAdapter(List<FileListItem> files){
+    public FileListAdapter(List<FileData> files){
         this.files=files;
     }
 

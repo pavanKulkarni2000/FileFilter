@@ -1,7 +1,12 @@
 package com.example.filefilter.fileFetcher;
 
+import static com.example.filefilter.fileFetcher.FileUtil.fileSizeToString;
+import static com.example.filefilter.fileFetcher.FileUtil.getDirectorySize;
+import static com.example.filefilter.fileFetcher.FileUtil.getFileMimeType;
+
 import android.util.Log;
 
+import com.example.filefilter.FileType;
 import com.example.filefilter.R;
 
 import java.io.File;
@@ -10,6 +15,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class FileLister implements Runnable {
@@ -26,45 +33,24 @@ public class FileLister implements Runnable {
     @Override
     public void run() {
         File parentFolder=new File(currentFolder);
-        List<FileListItem> files = Arrays.stream(parentFolder.listFiles(getFileFilterFromFlags())).map(FileUtil::createFileListItem).collect(Collectors.toList());
+        Map<Boolean,List<FileData>> map= Arrays.stream(parentFolder.listFiles(getFileFilterFromFlags())).map(FileUtil::createFileListItem).collect(Collectors.partitioningBy(fileData -> fileData.getFileType()==FileType.Directory));
 //        Log.d(TAG, "run: Finished listing, "+Arrays.toString(files.toArray()));
-        callback.onFileListReady(files);
+        map.get(Boolean.FALSE).addAll(map.get(Boolean.TRUE));
+        callback.onFileListReady(map.get(Boolean.FALSE));
+
+        //calculate folder sizes later
+        map.get(Boolean.TRUE).forEach(fileListItem -> fileListItem.setFileSize(fileSizeToString(getDirectorySize(new File(currentFolder+"/"+fileListItem.getFileName())))));
+
     }
 
     private FileFilter getFileFilterFromFlags() {
         return file -> {
             if (fileSearchData.isDateFlag()) {
-                Log.d(TAG, "getFileFilterFromFlags: lastmodified="+file.lastModified()+" start="+fileSearchData.getStartDate().getTime()+" end="+fileSearchData.getEndDate().getTime());
+//                Log.d(TAG, "getFileFilterFromFlags: lastmodified="+file.lastModified()+" start="+fileSearchData.getStartDate().getTime()+" end="+fileSearchData.getEndDate().getTime());
                 if (file.lastModified() < fileSearchData.getStartDate().getTime() || file.lastModified() > fileSearchData.getEndDate().getTime())
                     return false;
             }
-            if(fileSearchData.getFileType()== R.id.mime_all){
-                return true;
-            }
-
-            String mime = null;
-            try {
-                String ext = Files.probeContentType(file.toPath());
-                mime=((ext==null)?"other":ext.split("/")[0]);
-            } catch (IOException e) {
-                Log.e(TAG, "getFileFilterFromFlags: ",e );
-            }
-
-            switch (fileSearchData.getFileType()){
-                case R.id.mime_other:
-                    return mime==null || mime.equals("other");
-                case R.id.mime_doc:
-                    return mime!=null && (mime.equals("application") || mime.equals("text"));
-                case R.id.mime_image:
-                    return mime!=null && mime.equals("image");
-                case R.id.mime_video:
-                    return mime!=null && mime.equals("video") ;
-                case R.id.mime_audio:
-                    return mime!=null && mime.equals("audio");
-                default:
-                    Log.e(TAG, "getFileFilterFromFlags: unknown file type set in filters"+fileSearchData.getFileType() );
-                    return false;
-            }
+            return fileSearchData.getFileType() == FileType.All || getFileMimeType(file.toPath()) == fileSearchData.getFileType();
         };
     }
 

@@ -1,5 +1,6 @@
 package com.example.filefilter.fileFetcher;
 
+import com.example.filefilter.FileType;
 import com.example.filefilter.R;
 
 import java.util.Date;
@@ -9,9 +10,9 @@ public class FileSearchData {
     private boolean dateFlag=false;
     private Date startDate;
     private Date endDate;
-    private int fileType= R.id.mime_all;
+    private FileType fileType= FileType.All;
 
-    public void setFileType(int fileType) {
+    public void setFileType(FileType fileType) {
         this.fileType = fileType;
     }
 
@@ -39,11 +40,11 @@ public class FileSearchData {
         this.endDate = endDate;
     }
 
-    public int getFileType() {
+    public FileType getFileType() {
         return fileType;
     }
 
-    public void setFileTypeId(int fileType) {
+    public void setFileTypeId(FileType fileType) {
         this.fileType = fileType;
     }
 }

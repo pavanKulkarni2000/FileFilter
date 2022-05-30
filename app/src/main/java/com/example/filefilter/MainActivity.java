@@ -14,8 +14,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -24,7 +22,7 @@ import android.widget.Toast;
 
 import com.example.filefilter.fileFetcher.FileSearchData;
 import com.example.filefilter.fileFetcher.FileListAdapter;
-import com.example.filefilter.fileFetcher.FileListItem;
+import com.example.filefilter.fileFetcher.FileData;
 import com.example.filefilter.fileFetcher.FileLister;
 import com.example.filefilter.fileFetcher.IFileListReadyCallback;
 import com.example.filefilter.folderPicker.FolderPickerDialog;
@@ -59,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
     private RadioGroup fileTypeRadioGroup;
 
     //state
-    private List<FileListItem> fileList;
+    private List<FileData> fileList;
     private String currentFolder;
     private Future<?> searchResult;
     private FileSearchData fileSearchData;
@@ -96,8 +94,9 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
         //filtering
         fileTypeRadioGroup=findViewById(R.id.file_type_radio_group);
         fileTypeRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
-            if(fileSearchData.getFileType()!=i){
-                fileSearchData.setFileType(i);
+            String selectedFileType=((RadioButton)fileTypeRadioGroup.findViewById(i)).getText().toString();
+            if(!fileSearchData.getFileType().name().equals(selectedFileType)){
+                fileSearchData.setFileType(FileType.valueOf(selectedFileType));
                 searchWithFilters();
             }
         });
@@ -212,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements IFolderSelectedCa
     }
 
     @Override
-    public void onFileListReady(List<FileListItem> files) {
+    public void onFileListReady(List<FileData> files) {
         Log.d(TAG, "onFileListReady: Got result with "+files.size()+" files");
         fileList.clear();
         fileList.addAll(files);

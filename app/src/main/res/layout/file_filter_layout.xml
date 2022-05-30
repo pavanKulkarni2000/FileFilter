@@ -58,6 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingHorizontal="@dimen/listItemPadding"
                 android:textSize="@dimen/bodyTextMedium"
                 android:text="@string/all"/>
             <RadioButton
@@ -65,6 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingHorizontal="@dimen/listItemPadding"
                 android:textSize="@dimen/bodyTextMedium"
                 android:text="@string/images"/>
             <RadioButton
@@ -72,6 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingHorizontal="@dimen/listItemPadding"
                 android:textSize="@dimen/bodyTextMedium"
                 android:text="@string/documents"/>
 
@@ -80,6 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingHorizontal="@dimen/listItemPadding"
                 android:textSize="@dimen/bodyTextMedium"
                 android:text="@string/video"/>
 
@@ -88,13 +92,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingHorizontal="@dimen/listItemPadding"
                 android:textSize="@dimen/bodyTextMedium"
                 android:text="@string/audio"/>
+            <RadioButton
+                android:id="@+id/mime_directory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingHorizontal="@dimen/listItemPadding"
+                android:textSize="@dimen/bodyTextMedium"
+                android:text="@string/directory"/>
             <RadioButton
                 android:id="@+id/mime_other"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:paddingHorizontal="@dimen/listItemPadding"
                 android:textSize="@dimen/bodyTextMedium"
                 android:text="@string/others"/>
 
