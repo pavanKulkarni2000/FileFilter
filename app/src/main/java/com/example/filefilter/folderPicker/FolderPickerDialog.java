@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class FolderPickerDialog extends DialogFragment {
 
     private static final String TAG = "FolderPickerDialog";
-    IFolderSelectedCallback hostActivity;
+    IFolderChangeListener hostActivity;
     LinkedList<String> currentFolderStack =new LinkedList<>();
 
     List<String> currentFolderList;
@@ -65,7 +65,7 @@ public class FolderPickerDialog extends DialogFragment {
         select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                hostActivity.onFolderSelected(String.join("/", currentFolderStack));
+                hostActivity.onFolderChange(String.join("/", currentFolderStack));
                 dismiss();
             }
         });
@@ -106,7 +106,7 @@ public class FolderPickerDialog extends DialogFragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         try{
-            hostActivity= (IFolderSelectedCallback) context;
+            hostActivity= (IFolderChangeListener) context;
         }catch (ClassCastException e){
             Log.e(TAG, "onAttach: ", e);
         }

@@ -5,7 +5,7 @@ import com.example.filefilter.R;
 
 import java.util.Date;
 
-public class FileSearchData {
+public class FileFilterData {
 
     private boolean dateFlag=false;
     private Date startDate;
