@@ -19,20 +19,20 @@ public class FileData {
         return fileName;
     }
 
-    public String getFileSize() {
-        return fileSize;
-    }
-
-    public String getFileDate() {
-        return fileDate;
-    }
-
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
+    public String getFileSize() {
+        return fileSize;
+    }
+
     public void setFileSize(String fileSize) {
         this.fileSize = fileSize;
+    }
+
+    public String getFileDate() {
+        return fileDate;
     }
 
     public void setFileDate(String fileDate) {

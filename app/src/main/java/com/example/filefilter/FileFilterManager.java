@@ -4,6 +4,7 @@ import static com.example.filefilter.fileFetcher.FileUtil.simpleDateFormat;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
@@ -14,40 +15,43 @@ import android.widget.Toast;
 import com.example.filefilter.fileFetcher.FileFilterData;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class FileFilterManager {
 
-    private CheckBox dateCheckBox;
-    private RadioGroup fileTypeRadioGroup;
-    private TextView dateStartTextView, dateEndTextView;
-    private FileFilterData fileFilterData;
-    private View parentView;
+    private static final String TAG = "FileFilterManager";
+    private final CheckBox dateCheckBox;
+    private final RadioGroup fileTypeRadioGroup;
+    private final TextView dateStartTextView;
+    private final TextView dateEndTextView;
+    private final FileFilterData fileFilterData;
+    private final View parentView;
 
-    FileFilterManager(Context context, View fileFilterParentView, IFileFilterChangeListener filterChangeListener){
-        this.parentView=fileFilterParentView;
+    FileFilterManager(Context context, View fileFilterParentView, IFileFilterChangeListener filterChangeListener) {
 
-        this.dateCheckBox=parentView.findViewById(R.id.date_check);
-        this.dateStartTextView=parentView.findViewById(R.id.date_start);
-        this.dateEndTextView=parentView.findViewById(R.id.date_end);
+        Log.d(TAG, "FileFilterManager: initializing File filter manager");
+        this.parentView = fileFilterParentView;
 
-        this.fileTypeRadioGroup =parentView.findViewById(R.id.file_type_radio_group);
+        this.dateCheckBox = parentView.findViewById(R.id.date_check);
+        this.dateStartTextView = parentView.findViewById(R.id.date_start);
+        this.dateEndTextView = parentView.findViewById(R.id.date_end);
 
-        fileFilterData=new FileFilterData();
+        this.fileTypeRadioGroup = parentView.findViewById(R.id.file_type_radio_group);
+
+        fileFilterData = new FileFilterData();
 
         //filtering
         fileTypeRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
-            String selectedFileType=((RadioButton)fileTypeRadioGroup.findViewById(i)).getText().toString();
-            if(!fileFilterData.getFileType().name().equals(selectedFileType)){
+            String selectedFileType = ((RadioButton) fileTypeRadioGroup.findViewById(i)).getText().toString();
+            if (!fileFilterData.getFileType().name().equals(selectedFileType)) {
                 fileFilterData.setFileType(FileType.valueOf(selectedFileType));
-                filterChangeListener.onFileFilterChange();
+                filterChangeListener.onFileFilterChange(fileFilterData);
             }
         });
         dateStartTextView.setOnClickListener(textView -> {
-            Date date=fileFilterData.getStartDate();
+            long date = fileFilterData.getStartDate();
             Calendar cldr = Calendar.getInstance();
-            if(date!=null){
-                cldr.setTime(date);
+            if (date != 0) {
+                cldr.setTimeInMillis(date);
             }
             int now_day = cldr.get(Calendar.DAY_OF_MONTH);
             int now_month = cldr.get(Calendar.MONTH);
@@ -55,22 +59,28 @@ public class FileFilterManager {
             // date picker dialog
             DatePickerDialog picker = new DatePickerDialog(context,
                     (datePickerView, year, month, day) -> {
-                        cldr.set(year,month,day);
-                        Date selectedStartDate=cldr.getTime();
-                        if(fileFilterData.getEndDate()!=null && selectedStartDate.getTime()>fileFilterData.getEndDate().getTime()){
-                            Toast.makeText(context,"Start date cannot be after end date.",Toast.LENGTH_SHORT).show();
-                        }else {
-                            fileFilterData.setStartDate(cldr.getTime());
+                        cldr.set(year, month, day);
+                        long selectedStartDate = cldr.getTimeInMillis();
+                        if (fileFilterData.isDateFlag()) {
+                            if (fileFilterData.getEndDate() != 0 && selectedStartDate > fileFilterData.getEndDate()) {
+                                Toast.makeText(context, "Start date cannot be after end date.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                fileFilterData.setStartDate(selectedStartDate);
+                                dateStartTextView.setText(String.format("From: %s", simpleDateFormat.format(fileFilterData.getStartDate())));
+                                filterChangeListener.onFileFilterChange(fileFilterData);
+                            }
+                        } else {
+                            fileFilterData.setStartDate(selectedStartDate);
                             dateStartTextView.setText(String.format("From: %s", simpleDateFormat.format(fileFilterData.getStartDate())));
                         }
                     }, now_year, now_month, now_day);
             picker.show();
         });
         dateEndTextView.setOnClickListener(textView -> {
-            Date date=fileFilterData.getEndDate();
+            long date = fileFilterData.getEndDate();
             Calendar cldr = Calendar.getInstance();
-            if(date!=null){
-                cldr.setTime(date);
+            if (date != 0) {
+                cldr.setTimeInMillis(date);
             }
             int now_day = cldr.get(Calendar.DAY_OF_MONTH);
             int now_month = cldr.get(Calendar.MONTH);
@@ -78,11 +88,17 @@ public class FileFilterManager {
             // date picker dialog
             DatePickerDialog picker = new DatePickerDialog(context,
                     (datePickerView, year, month, day) -> {
-                        cldr.set(year,month,day);
-                        Date selectedEndDate = cldr.getTime();
-                        if(fileFilterData.getStartDate()!=null && selectedEndDate.getTime() < fileFilterData.getStartDate().getTime()){
-                            Toast.makeText(context,"End date cannot be before start date.",Toast.LENGTH_SHORT).show();
-                        }else{
+                        cldr.set(year, month, day);
+                        long selectedEndDate = cldr.getTimeInMillis();
+                        if (fileFilterData.isDateFlag())
+                            if (fileFilterData.getStartDate() != 0 && selectedEndDate < fileFilterData.getStartDate()) {
+                                Toast.makeText(context, "End date cannot be before start date.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                fileFilterData.setEndDate(selectedEndDate);
+                                dateEndTextView.setText(String.format("To: %s", simpleDateFormat.format(selectedEndDate)));
+                                filterChangeListener.onFileFilterChange(fileFilterData);
+                            }
+                        else {
                             fileFilterData.setEndDate(selectedEndDate);
                             dateEndTextView.setText(String.format("To: %s", simpleDateFormat.format(selectedEndDate)));
                         }
@@ -90,24 +106,29 @@ public class FileFilterManager {
             picker.show();
         });
         dateCheckBox.setOnCheckedChangeListener((compoundButton, b) -> {
-            if(b){
-                if(fileFilterData.getStartDate()==null){
-                    Toast.makeText(context,"Select start date!",Toast.LENGTH_SHORT).show();
+            if (b) {
+                if (fileFilterData.getStartDate() == 0) {
+                    Toast.makeText(context, "Select start date!", Toast.LENGTH_SHORT).show();
                     compoundButton.setChecked(false);
-                } else if(fileFilterData.getEndDate()==null){
-                    Toast.makeText(context,"Select end date!",Toast.LENGTH_SHORT).show();
+                } else if (fileFilterData.getEndDate() == 0) {
+                    Toast.makeText(context, "Select end date!", Toast.LENGTH_SHORT).show();
                     compoundButton.setChecked(false);
-                }else if(fileFilterData.getStartDate().getTime()>=fileFilterData.getEndDate().getTime()){
-                    Toast.makeText(context,"Start date should be before end date!",Toast.LENGTH_SHORT).show();
+                } else if (fileFilterData.getStartDate() >= fileFilterData.getEndDate()) {
+                    Toast.makeText(context, "Start date should be before end date!", Toast.LENGTH_SHORT).show();
                     compoundButton.setChecked(false);
+                } else {
+                    fileFilterData.setDateFlag(true);
+                    filterChangeListener.onFileFilterChange(fileFilterData);
                 }
-                fileFilterData.setDateFlag(true);
-                filterChangeListener.onFileFilterChange();
-            }else{
+            } else {
                 fileFilterData.setDateFlag(false);
-                filterChangeListener.onFileFilterChange();
+                filterChangeListener.onFileFilterChange(fileFilterData);
             }
         });
 
+    }
+
+    public FileFilterData getFileFilterData() {
+        return fileFilterData;
     }
 }

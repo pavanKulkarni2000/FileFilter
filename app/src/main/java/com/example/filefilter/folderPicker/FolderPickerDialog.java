@@ -28,7 +28,7 @@ public class FolderPickerDialog extends DialogFragment {
 
     private static final String TAG = "FolderPickerDialog";
     IFolderChangeListener hostActivity;
-    LinkedList<String> currentFolderStack =new LinkedList<>();
+    LinkedList<String> currentFolderStack = new LinkedList<>();
 
     List<String> currentFolderList;
     ArrayAdapter<String> folderListAdapter;
@@ -50,22 +50,22 @@ public class FolderPickerDialog extends DialogFragment {
 
         init();
 
-        ImageButton back=dialog.findViewById(R.id.folder_back);
+        ImageButton back = dialog.findViewById(R.id.folder_back);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(currentFolderStack.size()>2){
+                if (currentFolderStack.size() > 2) {
                     currentFolderStack.removeLast();
                     updateCurrentFolderListAndNotify();
                 }
             }
         });
 
-        ImageButton select=dialog.findViewById(R.id.folder_select);
+        ImageButton select = dialog.findViewById(R.id.folder_select);
         select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                hostActivity.onFolderChange(String.join("/", currentFolderStack));
+                hostActivity.onChildDirectoryResolved(String.join("/", currentFolderStack));
                 dismiss();
             }
         });
@@ -74,8 +74,8 @@ public class FolderPickerDialog extends DialogFragment {
     }
 
     private void init() {
-        currentFolderList=getCurrentFolderList();
-        folderListAdapter=new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, currentFolderList);
+        currentFolderList = getCurrentFolderList();
+        folderListAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, currentFolderList);
         folderListView.setAdapter(folderListAdapter);
         folderListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -90,7 +90,7 @@ public class FolderPickerDialog extends DialogFragment {
     private List<String> getCurrentFolderList() {
         String current_folder = String.join("/", currentFolderStack);
 //        Log.d(TAG, "getCurrentFolderList: currentfolder="+current_folder);
-        File parentFolder=new File(current_folder);
+        File parentFolder = new File(current_folder);
 //        Log.d(TAG, "getCurrentFolderList: "+ Arrays.toString(parentFolder.list()));
         return Arrays.stream(parentFolder.listFiles(File::isDirectory)).map(File::getName).collect(Collectors.toList());
     }
@@ -105,9 +105,9 @@ public class FolderPickerDialog extends DialogFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        try{
-            hostActivity= (IFolderChangeListener) context;
-        }catch (ClassCastException e){
+        try {
+            hostActivity = (IFolderChangeListener) context;
+        } catch (ClassCastException e) {
             Log.e(TAG, "onAttach: ", e);
         }
     }

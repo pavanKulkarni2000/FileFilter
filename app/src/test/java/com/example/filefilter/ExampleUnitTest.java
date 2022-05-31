@@ -1,8 +1,8 @@
 package com.example.filefilter;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +19,7 @@ public class ExampleUnitTest {
     public void addition_isCorrect() {
         String mime;
         try {
-             mime = Files.probeContentType(Paths.get("attachment.mp3"));
+            mime = Files.probeContentType(Paths.get("attachment.mp3"));
         } catch (IOException e) {
             e.printStackTrace();
         }

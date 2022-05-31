@@ -1,83 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/file_filter_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/file_filter_parent"
     android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/filters"
         android:padding="10dp"
+        android:text="@string/filters"
         android:textSize="@dimen/heading1"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <CheckBox
+            android:id="@+id/date_check"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/date_check"/>
+            android:layout_weight="1" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="5"
             android:text="@string/column_date"
-            android:layout_weight="5"
-            android:textSize="@dimen/bodyTextMedium"/>
+            android:textSize="@dimen/bodyTextMedium" />
+
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/date_start"
-            android:layout_weight="5"
-            android:background="#eeeeee"
-            android:layout_marginHorizontal="8dp"
-            android:text="@string/from_date"
-            android:textSize="@dimen/bodyTextMedium"/>
-        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/date_end"
+            android:layout_marginHorizontal="8dp"
             android:layout_weight="5"
             android:background="#eeeeee"
+            android:text="@string/from_date"
+            android:textSize="@dimen/bodyTextMedium" />
+
+        <TextView
+            android:id="@+id/date_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
+            android:layout_weight="5"
+            android:background="#eeeeee"
             android:text="@string/to_date"
-            android:textSize="@dimen/bodyTextMedium"/>
+            android:textSize="@dimen/bodyTextMedium" />
     </LinearLayout>
+
     <HorizontalScrollView
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
+
         <RadioGroup
+            android:id="@+id/file_type_radio_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/file_type_radio_group">
+            android:orientation="horizontal">
+
             <RadioButton
                 android:id="@+id/mime_all"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingHorizontal="@dimen/listItemPadding"
-                android:textSize="@dimen/bodyTextMedium"
-                android:text="@string/all"/>
+                android:text="@string/all"
+                android:textSize="@dimen/bodyTextMedium" />
+
             <RadioButton
                 android:id="@+id/mime_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingHorizontal="@dimen/listItemPadding"
-                android:textSize="@dimen/bodyTextMedium"
-                android:text="@string/images"/>
+                android:text="@string/images"
+                android:textSize="@dimen/bodyTextMedium" />
+
             <RadioButton
                 android:id="@+id/mime_doc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingHorizontal="@dimen/listItemPadding"
-                android:textSize="@dimen/bodyTextMedium"
-                android:text="@string/documents"/>
+                android:text="@string/documents"
+                android:textSize="@dimen/bodyTextMedium" />
 
             <RadioButton
                 android:id="@+id/mime_video"
@@ -85,8 +95,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingHorizontal="@dimen/listItemPadding"
-                android:textSize="@dimen/bodyTextMedium"
-                android:text="@string/video"/>
+                android:text="@string/video"
+                android:textSize="@dimen/bodyTextMedium" />
 
             <RadioButton
                 android:id="@+id/mime_audio"
@@ -94,24 +104,26 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingHorizontal="@dimen/listItemPadding"
-                android:textSize="@dimen/bodyTextMedium"
-                android:text="@string/audio"/>
+                android:text="@string/audio"
+                android:textSize="@dimen/bodyTextMedium" />
+
             <RadioButton
                 android:id="@+id/mime_directory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingHorizontal="@dimen/listItemPadding"
-                android:textSize="@dimen/bodyTextMedium"
-                android:text="@string/directory"/>
+                android:text="@string/directory"
+                android:textSize="@dimen/bodyTextMedium" />
+
             <RadioButton
                 android:id="@+id/mime_other"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:paddingHorizontal="@dimen/listItemPadding"
-                android:textSize="@dimen/bodyTextMedium"
-                android:text="@string/others"/>
+                android:text="@string/others"
+                android:textSize="@dimen/bodyTextMedium" />
 
         </RadioGroup>
     </HorizontalScrollView>

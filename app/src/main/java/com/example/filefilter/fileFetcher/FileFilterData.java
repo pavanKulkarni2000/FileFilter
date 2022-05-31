@@ -1,20 +1,13 @@
 package com.example.filefilter.fileFetcher;
 
 import com.example.filefilter.FileType;
-import com.example.filefilter.R;
-
-import java.util.Date;
 
 public class FileFilterData {
 
-    private boolean dateFlag=false;
-    private Date startDate;
-    private Date endDate;
-    private FileType fileType= FileType.All;
-
-    public void setFileType(FileType fileType) {
-        this.fileType = fileType;
-    }
+    private boolean dateFlag = false;
+    private long startDate = 0;
+    private long endDate = 0;
+    private FileType fileType = FileType.ALL;
 
     public boolean isDateFlag() {
         return dateFlag;
@@ -24,24 +17,28 @@ public class FileFilterData {
         this.dateFlag = dateFlag;
     }
 
-    public Date getStartDate() {
+    public long getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(long startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 
     public FileType getFileType() {
         return fileType;
+    }
+
+    public void setFileType(FileType fileType) {
+        this.fileType = fileType;
     }
 
     public void setFileTypeId(FileType fileType) {

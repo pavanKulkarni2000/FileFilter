@@ -2,7 +2,7 @@ package com.example.filefilter.fileFetcher;
 
 import static com.example.filefilter.fileFetcher.FileUtil.fileSizeToString;
 import static com.example.filefilter.fileFetcher.FileUtil.getDirectorySize;
-import static com.example.filefilter.fileFetcher.FileUtil.getFileMimeType;
+import static com.example.filefilter.fileFetcher.FileUtil.getFileType;
 
 import com.example.filefilter.FileType;
 
@@ -19,21 +19,23 @@ public class FileLister implements Runnable {
     private final IFileListReadyCallback callback;
     private final String currentFolder;
     private final FileFilterData fileFilterData;
-    public FileLister(String currentFolder, FileFilterData fileFilterData, IFileListReadyCallback fileListReadyCallback){
-        this.currentFolder=currentFolder;
-        this.callback=fileListReadyCallback;
+
+    public FileLister(String currentFolder, FileFilterData fileFilterData, IFileListReadyCallback fileListReadyCallback) {
+        this.currentFolder = currentFolder;
+        this.callback = fileListReadyCallback;
         this.fileFilterData = fileFilterData;
     }
+
     @Override
     public void run() {
-        File parentFolder=new File(currentFolder);
-        Map<Boolean,List<FileData>> map= Arrays.stream(parentFolder.listFiles(getFileFilterFromFlags())).map(FileUtil::createFileListItem).collect(Collectors.partitioningBy(fileData -> fileData.getFileType()==FileType.Directory));
+        File parentFolder = new File(currentFolder);
+        Map<Boolean, List<FileData>> map = Arrays.stream(parentFolder.listFiles(getFileFilterFromFlags())).map(FileUtil::createFileListItem).collect(Collectors.partitioningBy(fileData -> fileData.getFileType() == FileType.DIRECTORY));
 //        Log.d(TAG, "run: Finished listing, "+Arrays.toString(files.toArray()));
         map.get(Boolean.FALSE).addAll(map.get(Boolean.TRUE));
         callback.onFileListReady(map.get(Boolean.FALSE));
 
         //calculate folder sizes later
-        map.get(Boolean.TRUE).forEach(fileListItem -> fileListItem.setFileSize(fileSizeToString(getDirectorySize(new File(currentFolder+"/"+fileListItem.getFileName())))));
+        map.get(Boolean.TRUE).forEach(fileListItem -> fileListItem.setFileSize(fileSizeToString(getDirectorySize(new File(currentFolder + "/" + fileListItem.getFileName())))));
 
     }
 
@@ -41,10 +43,10 @@ public class FileLister implements Runnable {
         return file -> {
             if (fileFilterData.isDateFlag()) {
 //                Log.d(TAG, "getFileFilterFromFlags: lastmodified="+file.lastModified()+" start="+fileSearchData.getStartDate().getTime()+" end="+fileSearchData.getEndDate().getTime());
-                if (file.lastModified() < fileFilterData.getStartDate().getTime() || file.lastModified() > fileFilterData.getEndDate().getTime())
+                if (file.lastModified() < fileFilterData.getStartDate() || file.lastModified() > fileFilterData.getEndDate())
                     return false;
             }
-            return fileFilterData.getFileType() == FileType.All || getFileMimeType(file.toPath()) == fileFilterData.getFileType();
+            return fileFilterData.getFileType() == FileType.ALL || getFileType(file.toPath()) == fileFilterData.getFileType();
         };
     }
 

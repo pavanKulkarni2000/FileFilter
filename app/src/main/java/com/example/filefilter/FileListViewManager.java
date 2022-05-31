@@ -2,7 +2,6 @@ package com.example.filefilter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -13,99 +12,149 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.filefilter.fileFetcher.FileData;
+import com.example.filefilter.fileFetcher.FileFilterData;
 import com.example.filefilter.fileFetcher.FileListAdapter;
 import com.example.filefilter.folderPicker.IFolderChangeListener;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class FileListViewManager implements IFileFilterChangeListener, IFolderChangeListener, IFileChangeListener {
     private static final String TAG = "FileListViewManager";
-    private RecyclerView fileListView;
-    private FileListAdapter fileListAdapter;
-    private List<FileData> files;
-    private TextView emptyMsg;
-    private ProgressBar progressBar;
-    private View parentView;
-    private View currentView;
-    private FileManager fileManager;
-    Context context;
-    private String currentFolder;
-    private TextView currentFolderTextView;
+    private final RecyclerView fileListView;
+    private final FileListAdapter fileListAdapter;
+    private final List<FileData> files;
+    private final TextView emptyMsg;
+    private final ProgressBar progressBar;
+    private final View parentView;
+    private final FileManager fileManager;
+    private final Context context;
+    private View currentFileTableView;
+    private Path currentPath;
 
-    public FileListViewManager(Context context, View fileListParentView, FileManager fileManager){
-        parentView=fileListParentView;
-        this.fileManager=fileManager;
+    public FileListViewManager(Context context, View fileListParentView, FileManager fileManager) {
+        Log.d(TAG, "FileListViewManager: initializing File list view manager");
+        parentView = fileListParentView;
+        this.fileManager = fileManager;
+        this.context = context;
 
         //Initialize views
         //initialize current folder text view
-        currentFolderTextView =parentView.findViewById(R.id.current_folder);
-        currentFolderTextView.setMovementMethod(new ScrollingMovementMethod());
+//        this.currentFolderTextView =parentView.findViewById(R.id.current_folder);
+//        currentFolderTextView.setMovementMethod(new ScrollingMovementMethod());
 
-        emptyMsg =parentView.findViewById(R.id.empty_message);
-        progressBar =parentView.findViewById(R.id.progress_bar);
+        this.emptyMsg = parentView.findViewById(R.id.empty_message);
+        this.progressBar = parentView.findViewById(R.id.progress_bar);
 
         //initialize file list view
-        fileListView = parentView.findViewById(R.id.file_list);
+        this.fileListView = parentView.findViewById(R.id.file_list);
         fileListView.setLayoutManager(new LinearLayoutManager(context));
         fileListView.setItemAnimator(new DefaultItemAnimator());
-        files=new ArrayList<>();
-        fileListAdapter=new FileListAdapter(files);
-        fileListView.setAdapter(fileListAdapter);
-        currentView=fileListView;
 
         //initialize currentFolder variable to internal storage root folder
-        String internal_storage=System.getenv("EXTERNAL_STORAGE");
-        if(internal_storage!=null){
-            File internal_storage_file=new File(internal_storage);
-            setCurrentFolder(internal_storage_file.getAbsolutePath());
-        }else{
-            ((Activity)context).finish();
+        String internalStorage = System.getenv("EXTERNAL_STORAGE");
+        //exit activity if can't find internal storage
+        if (internalStorage == null) {
+            ((Activity) context).finish();
+        }
+
+        this.files = new LinkedList<>(Arrays.asList(new FileData(internalStorage.replaceAll("/", ""), null, null, FileType.DIRECTORY)));
+        this.fileListAdapter = new FileListAdapter(files, this);
+
+        fileListView.setAdapter(fileListAdapter);
+        currentFileTableView = fileListView;
+        currentPath = Paths.get("/");
+
+    }
+
+    private void swapCurrentView(View newView) {
+        currentFileTableView.setVisibility(View.GONE);
+        newView.setVisibility(View.VISIBLE);
+        currentFileTableView = newView;
+    }
+
+    private void submitSearchRequest() {
+        swapCurrentView(progressBar);
+        fileManager.search();
+    }
+
+    //new search
+    @Override
+    public void onFileFilterChange(FileFilterData fileFilterData) {
+        submitSearchRequest();
+    }
+
+    //new search
+    @Override
+    public void onChildDirectoryResolved(String folder) {
+        Path path = currentPath.resolve(folder);
+        if (Files.isDirectory(path)) {
+            currentPath = path;
+            submitSearchRequest();
         }
     }
 
-    private void swapCurrentView(View newView){
-        currentView.setVisibility(View.GONE);
-        newView.setVisibility(View.VISIBLE);
-        currentView=newView;
+    @Override
+    public void onParentDirectoryResolved() {
+        Path path = currentPath.getParent();
+        if(Files.isDirectory(path)){
+            currentPath=path;
+            submitSearchRequest();
+        }
     }
 
-    public void reloadFileList() {
-        Log.d(TAG, "reloadFileList: "+files.size()+" files");
-        ((Activity)context).runOnUiThread(() -> {
+    //update UI
+    @Override
+    public void onFilesChanged() {
+        Log.d(TAG, "onFilesChanged: " + files.size() + " files");
+        ((Activity) context).runOnUiThread(() -> {
             fileListAdapter.notifyDataSetChanged();
-            if(files.isEmpty()){
+            if (files.isEmpty()) {
                 swapCurrentView(emptyMsg);
-            }else{
+            } else {
                 swapCurrentView(fileListView);
             }
         });
     }
 
-    private void setCurrentFolder(String folder ) {
-        currentFolder =folder;
-        currentFolderTextView.setText(currentFolder);
-//        searchWithFilters();
+    //update UI
+    @Override
+    public void onFileRangeChanged(int start, int end) {
+        Log.d(TAG, "onFileRangeChanged: " + files.size() + " files");
+        ((Activity) context).runOnUiThread(() -> {
+            fileListAdapter.notifyItemRangeChanged(start, end);
+            if (files.isEmpty()) {
+                swapCurrentView(emptyMsg);
+            } else {
+                swapCurrentView(fileListView);
+            }
+        });
     }
 
-    @Override
-    public void onFileFilterChange() {
-        fileManager.search();
+    public Path getCurrentPath() {
+        return currentPath;
     }
 
-    @Override
-    public void onFolderChange(String folder) {
-        fileManager.search();
+    private void setCurrentPath(Path folder) {
+        currentPath = folder;
+//        currentFolderTextView.setText(currentPath.toString());
+//        fileManager.search();
     }
 
-    @Override
-    public void onFilesChanged() {
-        reloadFileList();
+    public List<FileData> getFiles() {
+        return files;
     }
 
-    @Override
-    public void onFileRangeChanged() {
-        reloadFileList();
+    public void clearFiles() {
+        files.clear();
     }
+
+    public void addFiles(List<FileData> fileData) {
+        files.addAll(fileData);
+    }
+
 }

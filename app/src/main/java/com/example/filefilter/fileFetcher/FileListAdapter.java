@@ -9,21 +9,30 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.filefilter.R;
+import com.example.filefilter.folderPicker.IFolderChangeListener;
 
 import java.util.List;
 
 public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHolder> {
-    private List<FileData> files;
+    private final List<FileData> files;
+    IFolderChangeListener folderChangeListener;
 
-    public FileListAdapter(List<FileData> files){
-        this.files=files;
+    public FileListAdapter(List<FileData> files, IFolderChangeListener folderChangeListener) {
+        this.folderChangeListener = folderChangeListener;
+        this.files = files;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.file_list_item,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.file_list_item, parent, false);
+        view.setOnClickListener(this::onFileClick);
         return new ViewHolder(view);
+    }
+
+    public void onFileClick(View view) {
+        TextView fileNameView = ((TextView) view.findViewById(R.id.file_name));
+        folderChangeListener.onChildDirectoryResolved(fileNameView.getText().toString());
     }
 
     @Override
@@ -38,15 +47,15 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
         return files.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView fileName,fileDate,fileSize;
+        TextView fileName, fileDate, fileSize;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            fileName=itemView.findViewById(R.id.file_name);
-            fileDate=itemView.findViewById(R.id.file_date);
-            fileSize=itemView.findViewById(R.id.file_size);
+            fileName = itemView.findViewById(R.id.file_name);
+            fileDate = itemView.findViewById(R.id.file_date);
+            fileSize = itemView.findViewById(R.id.file_size);
         }
     }
 }
