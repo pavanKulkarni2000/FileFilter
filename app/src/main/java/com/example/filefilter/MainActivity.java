@@ -1,10 +1,18 @@
 package com.example.filefilter;
 
-import static com.example.filefilter.Util.managePermissions;
+import static com.example.filefilter.utils.Util.managePermissions;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.filefilter.controllers.FileFilterManager;
+import com.example.filefilter.controllers.FileListViewManager;
+import com.example.filefilter.controllers.FileManager;
+
+import java.io.File;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         managePermissions(this, this);
 
         init();
+
+        Log.d(TAG, "onCreate: "+ Arrays.toString(new File("/storage/0A6C-1CF8").list()));
 
     }
 

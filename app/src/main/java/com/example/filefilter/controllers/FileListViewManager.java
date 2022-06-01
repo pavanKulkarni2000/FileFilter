@@ -1,4 +1,4 @@
-package com.example.filefilter;
+package com.example.filefilter.controllers;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,17 +11,21 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.filefilter.fileFetcher.FileData;
-import com.example.filefilter.fileFetcher.FileFilterData;
-import com.example.filefilter.fileFetcher.FileListAdapter;
-import com.example.filefilter.folderPicker.IFolderChangeListener;
+import com.example.filefilter.models.FileType;
+import com.example.filefilter.R;
+import com.example.filefilter.callbacks.IFileChangeListener;
+import com.example.filefilter.callbacks.IFileFilterChangeListener;
+import com.example.filefilter.models.FileData;
+import com.example.filefilter.models.FileFilterData;
+import com.example.filefilter.callbacks.IFolderChangeListener;
+import com.example.filefilter.utils.Util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileListViewManager implements IFileFilterChangeListener, IFolderChangeListener, IFileChangeListener {
     private static final String TAG = "FileListViewManager";
@@ -33,8 +37,10 @@ public class FileListViewManager implements IFileFilterChangeListener, IFolderCh
     private final View parentView;
     private final FileManager fileManager;
     private final Context context;
+    private final List<FileData> rootFolders;
     private View currentFileTableView;
-    private Path currentPath;
+    private Path currentPath=Paths.get("/");
+    private TextView currentPathView;
 
     public FileListViewManager(Context context, View fileListParentView, FileManager fileManager) {
         Log.d(TAG, "FileListViewManager: initializing File list view manager");
@@ -44,9 +50,9 @@ public class FileListViewManager implements IFileFilterChangeListener, IFolderCh
 
         //Initialize views
         //initialize current folder text view
-//        this.currentFolderTextView =parentView.findViewById(R.id.current_folder);
+        this.currentPathView =parentView.findViewById(R.id.current_path);
+        currentPathView.setText("/");
 //        currentFolderTextView.setMovementMethod(new ScrollingMovementMethod());
-
         this.emptyMsg = parentView.findViewById(R.id.empty_message);
         this.progressBar = parentView.findViewById(R.id.progress_bar);
 
@@ -54,6 +60,7 @@ public class FileListViewManager implements IFileFilterChangeListener, IFolderCh
         this.fileListView = parentView.findViewById(R.id.file_list);
         fileListView.setLayoutManager(new LinearLayoutManager(context));
         fileListView.setItemAnimator(new DefaultItemAnimator());
+        fileListView.setItemViewCacheSize(20);
 
         //initialize currentFolder variable to internal storage root folder
         String internalStorage = System.getenv("EXTERNAL_STORAGE");
@@ -62,13 +69,14 @@ public class FileListViewManager implements IFileFilterChangeListener, IFolderCh
             ((Activity) context).finish();
         }
 
-        this.files = new LinkedList<>(Arrays.asList(new FileData(internalStorage.replaceAll("/", ""), null, null, FileType.DIRECTORY)));
+        rootFolders = new LinkedList<>();
+        rootFolders.add(new FileData(internalStorage.replaceFirst("/", ""), null, null, FileType.DIRECTORY));
+        rootFolders.addAll(Util.getExternalMounts().stream().map(mount -> new FileData(mount.replaceFirst("/", ""), null, null, FileType.DIRECTORY)).collect(Collectors.toList()));
+        files=new LinkedList<>(rootFolders);
         this.fileListAdapter = new FileListAdapter(files, this);
 
         fileListView.setAdapter(fileListAdapter);
         currentFileTableView = fileListView;
-        currentPath = Paths.get("/");
-
     }
 
     private void swapCurrentView(View newView) {
@@ -78,8 +86,22 @@ public class FileListViewManager implements IFileFilterChangeListener, IFolderCh
     }
 
     private void submitSearchRequest() {
-        swapCurrentView(progressBar);
-        fileManager.search();
+            swapCurrentView(progressBar);
+            fileManager.search();
+    }
+
+    private void setCurrentPath(Path path) {
+        if(currentPath!=path) {
+            currentPath=path;
+            currentPathView.setText(currentPath.toString());
+            if (!currentPath.toString().equals("/")) {
+                submitSearchRequest();
+            }else{
+                files.clear();
+                files.addAll(rootFolders);
+                onFilesChanged();
+            }
+        }
     }
 
     //new search
@@ -91,10 +113,9 @@ public class FileListViewManager implements IFileFilterChangeListener, IFolderCh
     //new search
     @Override
     public void onChildDirectoryResolved(String folder) {
-        Path path = currentPath.resolve(folder);
+        Path path = getCurrentPath().resolve(folder);
         if (Files.isDirectory(path)) {
-            currentPath = path;
-            submitSearchRequest();
+            setCurrentPath(path);
         }
     }
 
@@ -102,8 +123,7 @@ public class FileListViewManager implements IFileFilterChangeListener, IFolderCh
     public void onParentDirectoryResolved() {
         Path path = currentPath.getParent();
         if(Files.isDirectory(path)){
-            currentPath=path;
-            submitSearchRequest();
+            setCurrentPath(path);
         }
     }
 
@@ -137,12 +157,6 @@ public class FileListViewManager implements IFileFilterChangeListener, IFolderCh
 
     public Path getCurrentPath() {
         return currentPath;
-    }
-
-    private void setCurrentPath(Path folder) {
-        currentPath = folder;
-//        currentFolderTextView.setText(currentPath.toString());
-//        fileManager.search();
     }
 
     public List<FileData> getFiles() {

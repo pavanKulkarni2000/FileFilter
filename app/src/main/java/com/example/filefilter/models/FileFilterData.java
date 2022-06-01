@@ -1,6 +1,4 @@
-package com.example.filefilter.fileFetcher;
-
-import com.example.filefilter.FileType;
+package com.example.filefilter.models;
 
 public class FileFilterData {
 

@@ -4,4 +4,7 @@
     <dimen name="heading1">18sp</dimen>
     <dimen name="listItem">14sp</dimen>
     <dimen name="listItemPadding">8dp</dimen>
+    <dimen name="listItemSmall">12sp</dimen>
+    <dimen name="listItemPaddingLarge">12dp</dimen>
+    <dimen name="bodyTextSmall">14sp</dimen>
 </resources>

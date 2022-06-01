@@ -1,14 +1,15 @@
-package com.example.filefilter;
+package com.example.filefilter.controllers;
 
-import static com.example.filefilter.fileFetcher.FileUtil.fileDateToString;
-import static com.example.filefilter.fileFetcher.FileUtil.fileSizeToString;
-import static com.example.filefilter.fileFetcher.FileUtil.getDirectorySize;
-import static com.example.filefilter.fileFetcher.FileUtil.getFileType;
+import static com.example.filefilter.utils.FileUtil.fileDateToString;
+import static com.example.filefilter.utils.FileUtil.fileSizeToString;
+import static com.example.filefilter.utils.FileUtil.getDirectorySize;
+import static com.example.filefilter.utils.FileUtil.getFileType;
 
 import android.util.Log;
 
-import com.example.filefilter.fileFetcher.FileData;
-import com.example.filefilter.fileFetcher.FileFilterData;
+import com.example.filefilter.models.FileType;
+import com.example.filefilter.models.FileData;
+import com.example.filefilter.models.FileFilterData;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class FileManager {
     private FileFilterManager fileFilterManager;
     private Future<?> searchResult;
 
-    FileManager() {
+    public FileManager() {
         //initialize executor services for background work
         executorService = Executors.newFixedThreadPool(4);
     }
@@ -85,6 +86,7 @@ public class FileManager {
                 Path dirPath = searchPath.resolve(directory.getFileName());
                 directorySizes.add(fileSizeToString(getDirectorySize(dirPath.toFile())));
             });
+
             for(int i=0;i<directories.size();i++){
                 directories.get(i).setFileSize(directorySizes.get(i));
             }

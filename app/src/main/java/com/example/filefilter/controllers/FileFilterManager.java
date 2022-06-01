@@ -1,6 +1,6 @@
-package com.example.filefilter;
+package com.example.filefilter.controllers;
 
-import static com.example.filefilter.fileFetcher.FileUtil.simpleDateFormat;
+import static com.example.filefilter.utils.FileUtil.simpleDateFormat;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -12,7 +12,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.filefilter.fileFetcher.FileFilterData;
+import com.example.filefilter.models.FileType;
+import com.example.filefilter.R;
+import com.example.filefilter.callbacks.IFileFilterChangeListener;
+import com.example.filefilter.models.FileFilterData;
 
 import java.util.Calendar;
 
@@ -26,7 +29,7 @@ public class FileFilterManager {
     private final FileFilterData fileFilterData;
     private final View parentView;
 
-    FileFilterManager(Context context, View fileFilterParentView, IFileFilterChangeListener filterChangeListener) {
+    public FileFilterManager(Context context, View fileFilterParentView, IFileFilterChangeListener filterChangeListener) {
 
         Log.d(TAG, "FileFilterManager: initializing File filter manager");
         this.parentView = fileFilterParentView;
@@ -41,7 +44,7 @@ public class FileFilterManager {
 
         //filtering
         fileTypeRadioGroup.setOnCheckedChangeListener((radioGroup, i) -> {
-            String selectedFileType = ((RadioButton) fileTypeRadioGroup.findViewById(i)).getText().toString();
+            String selectedFileType = ((RadioButton) fileTypeRadioGroup.findViewById(i)).getText().toString().toUpperCase();
             if (!fileFilterData.getFileType().name().equals(selectedFileType)) {
                 fileFilterData.setFileType(FileType.valueOf(selectedFileType));
                 filterChangeListener.onFileFilterChange(fileFilterData);

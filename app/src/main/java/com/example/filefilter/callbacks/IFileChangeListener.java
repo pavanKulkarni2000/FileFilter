@@ -1,4 +1,4 @@
-package com.example.filefilter;
+package com.example.filefilter.callbacks;
 
 public interface IFileChangeListener {
     void onFilesChanged();

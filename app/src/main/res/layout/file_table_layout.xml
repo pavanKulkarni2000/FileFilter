@@ -9,9 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="@string/files"
-        android:textSize="@dimen/heading1"
-        android:textStyle="bold" />
+        android:id="@+id/current_path"
+        android:textSize="@dimen/bodyTextSmall"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#808080"
+        android:paddingHorizontal="8dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,32 +31,47 @@
             android:text="@string/column_file"
             android:textSize="@dimen/bodyTextMedium"
             android:textStyle="bold" />
-
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#808080"
+            android:paddingVertical="4dp"/>
         <TextView
             android:id="@+id/file_size"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:padding="8dp"
             android:text="@string/column_size"
             android:textSize="@dimen/bodyTextMedium"
             android:textStyle="bold" />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#808080"
+            android:paddingVertical="4dp"/>
 
         <TextView
             android:id="@+id/file_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:padding="8dp"
             android:text="@string/column_date"
             android:textSize="@dimen/bodyTextMedium"
             android:textStyle="bold" />
     </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#808080"
+        android:paddingHorizontal="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/file_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:scrollbars="vertical"/>
 
     <TextView
         android:id="@+id/empty_message"

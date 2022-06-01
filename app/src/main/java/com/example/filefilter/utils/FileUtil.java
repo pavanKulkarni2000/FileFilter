@@ -1,8 +1,9 @@
-package com.example.filefilter.fileFetcher;
+package com.example.filefilter.utils;
 
 import android.util.Log;
 
-import com.example.filefilter.FileType;
+import com.example.filefilter.models.FileType;
+import com.example.filefilter.models.FileData;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 public class FileUtil {
     public static final long UNIT_KILO_BYTE = 1024;
@@ -39,17 +41,24 @@ public class FileUtil {
             return FileType.DIRECTORY;
         String mime;
         try {
-            String ext = Files.probeContentType(path);
-            if (ext == null) {
+            String mimeTypeSubType = Files.probeContentType(path);
+            if (mimeTypeSubType == null) {
                 mime = "OTHER";
             } else {
-                mime = ext.substring(0, 1).toUpperCase() + ext.substring(1);
+                mime = mimeTypeSubType.split("/")[0].toUpperCase();
             }
         } catch (IOException e) {
             Log.e(TAG, "getFileFilterFromFlags: ", e);
             mime = "OTHER";
         }
-        return FileType.valueOf(mime);
+        if(Objects.equals(mime, "application") || mime.equals("text"))
+            mime="DOCUMENT";
+        try{
+            return FileType.valueOf(mime);
+        }catch (IllegalArgumentException e){
+            Log.e(TAG, "getFileType: got mime type "+mime );
+            return FileType.OTHER;
+        }
     }
 
     public static long getDirectorySize(File directory) {

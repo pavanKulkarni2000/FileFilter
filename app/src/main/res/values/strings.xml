@@ -10,4 +10,5 @@
     <string name="filters">Filters:</string>
     <string name="from_date">From: </string>
     <string name="to_date">To: </string>
+    <string name="sample">Sample</string>
 </resources>

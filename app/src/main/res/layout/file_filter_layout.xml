@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="5"
+            android:layout_weight="1"
             android:text="@string/column_date"
             android:textSize="@dimen/bodyTextMedium" />
 
@@ -37,9 +37,12 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_weight="5"
-            android:background="#eeeeee"
+            android:gravity="center"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="2dp"
+            android:background="@drawable/rounded_corner"
             android:text="@string/from_date"
-            android:textSize="@dimen/bodyTextMedium" />
+            android:textSize="@dimen/listItem" />
 
         <TextView
             android:id="@+id/date_end"
@@ -47,9 +50,12 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_weight="5"
-            android:background="#eeeeee"
+            android:gravity="center"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="2dp"
+            android:background="@drawable/rounded_corner"
             android:text="@string/to_date"
-            android:textSize="@dimen/bodyTextMedium" />
+            android:textSize="@dimen/listItem" />
     </LinearLayout>
 
     <HorizontalScrollView

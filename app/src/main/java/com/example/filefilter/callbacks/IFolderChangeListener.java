@@ -1,4 +1,4 @@
-package com.example.filefilter.folderPicker;
+package com.example.filefilter.callbacks;
 
 public interface IFolderChangeListener {
     void onChildDirectoryResolved(String folder);
