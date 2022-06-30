@@ -1,16 +1,27 @@
-package com.example.filefilter.models;
+package com.example.filefilter.utils;
 
-public class FileData {
+import com.example.filefilter.models.FileFilterModel;
+
+public class FileItem {
     private String fileName;
     private String fileSize;
     private String fileDate;
-    private FileType fileType;
+    private FileFilterModel.FileType fileType;
+    private boolean selected = false;
 
-    public FileData(String fileName, String fileSize, String fileDate, FileType fileType) {
+    public FileItem(String fileName, String fileSize, String fileDate, FileFilterModel.FileType fileType) {
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileDate = fileDate;
         this.fileType = fileType;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public String getFileName() {
@@ -37,11 +48,11 @@ public class FileData {
         this.fileDate = fileDate;
     }
 
-    public FileType getFileType() {
+    public FileFilterModel.FileType getFileType() {
         return fileType;
     }
 
-    public void setFileType(FileType fileType) {
+    public void setFileType(FileFilterModel.FileType fileType) {
         this.fileType = fileType;
     }
 

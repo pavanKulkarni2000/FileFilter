@@ -40,7 +40,7 @@
             android:gravity="center"
             android:paddingVertical="6dp"
             android:paddingHorizontal="2dp"
-            android:background="@drawable/rounded_corner"
+            android:background="@drawable/date_text_background"
             android:text="@string/from_date"
             android:textSize="@dimen/listItem" />
 
@@ -53,7 +53,7 @@
             android:gravity="center"
             android:paddingVertical="6dp"
             android:paddingHorizontal="2dp"
-            android:background="@drawable/rounded_corner"
+            android:background="@drawable/date_text_background"
             android:text="@string/to_date"
             android:textSize="@dimen/listItem" />
     </LinearLayout>
@@ -61,7 +61,6 @@
     <HorizontalScrollView
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
-
         <RadioGroup
             android:id="@+id/file_type_radio_group"
             android:layout_width="match_parent"
@@ -133,5 +132,4 @@
 
         </RadioGroup>
     </HorizontalScrollView>
-
 </LinearLayout>

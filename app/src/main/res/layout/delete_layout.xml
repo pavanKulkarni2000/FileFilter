@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/delete_layout"
+    android:visibility="gone"
+    android:background="#ff0000">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:id="@+id/delete_count"
+                    android:layout_height="wrap_content"
+                    android:text="Delete 50000 files"
+                    android:textSize="@dimen/bodyTextMedium"
+                    android:padding="@dimen/listItemPaddingLarge"
+                    android:textColor="#ffffff"/>
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_baseline_delete_24"
+                    android:layout_gravity="center"
+                    android:id="@+id/delete_button"
+                    android:background="@drawable/delete_button_background"
+                    android:paddingVertical="8dp"
+                    android:paddingHorizontal="24dp"
+                    android:elevation="10dp"
+                    android:contentDescription="Delete selected files" />
+                <ProgressBar
+                    android:id="@+id/delete_progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:indeterminateDrawable="@drawable/delete_progress"/>
+        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/white"
+            android:text="SELECT ALL"
+            android:src="@drawable/ic_baseline_close_24"
+            android:id="@+id/delete_select_all"
+            android:padding="@dimen/listItemPadding"/>
+</RelativeLayout>

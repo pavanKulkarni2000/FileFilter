@@ -10,31 +10,26 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 public class Util {
 
     public static List<String> getExternalMounts() {
         File file = new File("/storage");
         String[] list = file.list((parent, childFile) -> !(childFile.equals("emulated") || childFile.equals("self")));
-        List<String> out=new ArrayList<>();
-        if(list==null || list.length==0)
+        List<String> out = new ArrayList<>();
+        if (list == null || list.length == 0)
             return out;
-        for(String fileName:list){
-            out.add("/storage/"+fileName);
+        for (String fileName : list) {
+            out.add("/storage/" + fileName);
         }
-        Log.d("TAG", "getExternalMounts: "+out);
+        Log.d("TAG", "getExternalMounts: " + out);
         return out;
+    }
+
+    public static boolean isBetween(long date, long after, long before) {
+        return date > after && date < before;
     }
 
     public static void managePermissions(Context context, Activity activity) {
